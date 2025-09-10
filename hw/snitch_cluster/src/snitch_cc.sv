@@ -60,6 +60,7 @@ module snitch_cc #(
   parameter bit          XF16ALT            = 0,
   parameter bit          XFVEC              = 0,
   parameter bit          XFDOTP             = 0,
+  parameter bit		 XPULPPOSTMOD	    = 0,
   /// Enable Snitch DMA
   parameter bit          Xdma               = 0,
   /// Has `frep` support.
@@ -233,6 +234,7 @@ module snitch_cc #(
     .FP_EN (FPEn),
     .Xdma (Xdma),
     .Xssr (Xssr),
+    .XPULPPOSTMOD (XPULPPOSTMOD),
     .Xcopift (Xcopift),
     .RVF (RVF),
     .RVD (RVD),

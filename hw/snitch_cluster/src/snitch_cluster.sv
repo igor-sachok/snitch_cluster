@@ -111,6 +111,8 @@ module snitch_cluster
   parameter bit [NrCores-1:0] Xfrep         = '0,
   /// Per-core enabling of the custom `Xcopift` ISA extensions.
   parameter bit [NrCores-1:0] Xcopift       = '0,
+  /// Per-core enabling of the custom 'XPULPPOSTMOD' ISA extensions.
+  parameter bit [NrCores-1:0] XPULPPOSTMOD       = '0,
   /// # Core-global parameters
   /// FPU configuration.
   parameter fpnew_pkg::fpu_implementation_t FPUImplementation [NrCores] =
@@ -659,9 +661,7 @@ module snitch_cluster
   );
 
 
-  logic [WideSlaveIdxBits-1:0] dma_xbar_default_port;
-  assign dma_xbar_default_port = SoCDMAOut;
-
+  logic [WideSlaveIdxBits-1:0] dma_xbar_default_port = SoCDMAOut;
   xbar_rule_t dma_xbar_default_port_rule;
   assign dma_xbar_default_port_rule = '{
     idx: dma_xbar_default_port,
@@ -1051,6 +1051,7 @@ module snitch_cluster
         .Xfrep (Xfrep[i]),
         .Xssr (Xssr[i]),
         .Xcopift (Xcopift[i]),
+        .XPULPPOSTMOD (XPULPPOSTMOD[i]),
         .Xipu (1'b0),
         .VMSupport (VMSupport),
         .NumIntOutstandingLoads (NumIntOutstandingLoads[i]),

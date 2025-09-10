@@ -125,6 +125,7 @@ module ${cfg['cluster']['name']}_wrapper (
     .Xssr (${core_cfg_flat('xssr')}),
     .Xfrep (${core_cfg_flat('xfrep')}),
     .Xcopift (${core_cfg_flat('xcopift')}),
+    .XPULPPOSTMOD (${core_cfg_flat('xpulppostmod')}),
     .FPUImplementation (${cfg['cluster']['name']}_pkg::FPUImplementation),
     .SnitchPMACfg (${cfg['cluster']['name']}_pkg::SnitchPMACfg),
     .NumIntOutstandingLoads (NumIntOutstandingLoads),

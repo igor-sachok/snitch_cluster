@@ -103,6 +103,7 @@ SNRT_APPS += $(SN_ROOT)/target/snitch_cluster/sw/apps/log
 SNRT_APPS += $(SN_ROOT)/target/snitch_cluster/sw/apps/kbpcpa
 SNRT_APPS += $(SN_ROOT)/target/snitch_cluster/sw/apps/box3d1r
 SNRT_APPS += $(SN_ROOT)/target/snitch_cluster/sw/apps/j3d27pt
+SNRT_APPS += $(SN_ROOT)/target/snitch_cluster/sw/apps/postinc_test
 endif
 
 # Include Makefile from each app subdirectory

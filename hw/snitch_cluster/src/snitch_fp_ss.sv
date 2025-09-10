@@ -1518,8 +1518,8 @@ module snitch_fp_ss import snitch_pkg::*; #(
         vectorial_op = 1'b1;
         if (acc_req_q.data_op inside {riscv_instr::VFSGNJX_R_B}) op_select[1] = RegBRep;
       end
-      riscv_instr::VFCPKA_B_S,
-      riscv_instr::VFCPKB_B_S: begin
+      riscv_instr::VFCPKA_B_S,				///same opcode for alternative!
+      riscv_instr::VFCPKB_B_S: begin               	///simple fix here?
         fpu_op = fpnew_pkg::CPKAB;
         op_select[0] = RegA;
         op_select[1] = RegB;
@@ -1530,8 +1530,8 @@ module snitch_fp_ss import snitch_pkg::*; #(
         set_dyn_rm   = 1'b1;
         if (acc_req_q.data_op inside {riscv_instr::VFCPKB_B_S}) op_mode = 1;
       end
-      riscv_instr::VFCPKC_B_S,
-      riscv_instr::VFCPKD_B_S: begin
+      riscv_instr::VFCPKC_B_S,				///same opcode for alternative!
+      riscv_instr::VFCPKD_B_S: begin			///simple fix here?
         fpu_op = fpnew_pkg::CPKCD;
         op_select[0] = RegA;
         op_select[1] = RegB;
