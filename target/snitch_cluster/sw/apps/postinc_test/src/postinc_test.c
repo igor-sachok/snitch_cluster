@@ -369,11 +369,137 @@ int main() {
              (0b0101011 <<  0)   \n" 
              : "+r"(rs1)
              : "r"(rs2)
-             : "a3", "a4"
+             : "a4", "a5"
              ); 
         result_rd = *(int32_t*)(0x10001100);
         result_rs1 = rs1; 
         if(!((result_rd == 0x71) && (result_rs1 == 0x10001104 ))){
+            errs = errs + 1;
+    }
+    //////////
+    //P_SB_RRPOST
+    rs2 = 0x21;
+    rs1 = 0x10001300; 
+    rd = 0x4;
+     asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
+            ".word (0b0000000 << 25) | \
+             (     (15) << 20) | \
+             (     (14) << 15) | \
+             (    0b100 << 12) | \
+             (    (13) << 7)   | \
+             (0b0101011 <<  0)   \n" 
+             : "+r"(rs1)
+             : "r"(rs2), "r"(rd)
+             : "a3", "a4", "a5"
+             ); 
+        result_rd = *(int8_t*)(0x10001300);
+        result_rs1 = rs1; 
+        if(!((result_rd == 0x21) && (result_rs1 == 0x10001300 + rd ))){
+            errs = errs + 1;
+    }
+    //////////
+    //P_SH_RRPOST
+    rs2 = 0x15;
+    rs1 = 0x10002000; 
+    rd = 0x8;
+     asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
+            ".word (0b0000000 << 25) | \
+             (     (15) << 20) | \
+             (     (14) << 15) | \
+             (    0b101 << 12) | \
+             (    (13) << 7)   | \
+             (0b0101011 <<  0)   \n" 
+             : "+r"(rs1)
+             : "r"(rs2), "r"(rd)
+             : "a3", "a4", "a5"
+             ); 
+        result_rd = *(int16_t*)(0x10002000);
+        result_rs1 = rs1; 
+        if(!((result_rd == 0x15) && (result_rs1 == 0x10002000 + rd ))){
+            errs = errs + 1;
+    }              
+    /////////
+    //P_SW_RRPOST
+    rs2 = 0x57;
+    rs1 = 0x10002500; 
+    rd = 0x100;
+     asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
+            ".word (0b0000000 << 25) | \
+             (     (15) << 20) | \
+             (     (14) << 15) | \
+             (    0b110 << 12) | \
+             (    (13) << 7)   | \
+             (0b0101011 <<  0)   \n" 
+             : "+r"(rs1)
+             : "r"(rs2), "r"(rd)
+             : "a3", "a4", "a5"
+             ); 
+        result_rd = *(int32_t*)(0x10002500);
+        result_rs1 = rs1; 
+        if(!((result_rd == 0x57) && (result_rs1 == 0x10002500 + rd ))){
+            errs = errs + 1;
+    }
+    /////////
+    //P_SB_RR
+    rs2 = 0x23;
+    rs1 = 0x10002800; 
+    rd = 0x100;
+     asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
+            ".word (0b0000000 << 25) | \
+             (     (15) << 20) | \
+             (     (14) << 15) | \
+             (    0b100 << 12) | \
+             (    (13) << 7)   | \
+             (0b0100011 <<  0)   \n" 
+             : 
+             : "r"(rs2), "+r"(rs1), "r"(rd) 
+             : "a3", "a4", "a5"
+             ); 
+        result_rd = *(int8_t*)(0x10002900);
+        result_rs1 = rs1; 
+        if(!((result_rd == 0x23) && (result_rs1 == 0x10002800))){
+            errs = errs + 1;
+    }
+    /////////
+    //P_SH_RR
+    rs2 = 0x18;
+    rs1 = 0x10002000; 
+    rd = 0x80;
+     asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
+            ".word (0b0000000 << 25) | \
+             (     (15) << 20) | \
+             (     (14) << 15) | \
+             (    0b101 << 12) | \
+             (    (13) << 7)   | \
+             (0b0100011 <<  0)   \n" 
+             : 
+             : "r"(rs2), "+r"(rs1), "r"(rd) 
+             : "a3", "a4", "a5"
+             ); 
+        result_rd = *(int16_t*)(0x10002080);
+        result_rs1 = rs1; 
+        if(!((result_rd == 0x18) && (result_rs1 == 0x10002000))){
+            errs = errs + 1;
+    }
+    /////////
+    //P_SW_RR
+    rs2 = 0x98;
+    rs1 = 0x10009000; 
+    rd = 0x20;
+     asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
+            ".word (0b0000000 << 25) | \
+             (     (15) << 20) | \
+             (     (14) << 15) | \
+             (    0b110 << 12) | \
+             (    (13) << 7)   | \
+             (0b0100011 <<  0)   \n" 
+             : 
+             : "r"(rs2), "+r"(rs1), "r"(rd) 
+             : "a3", "a4", "a5"
+             ); 
+        result_rd = *(int32_t*)(0x10009020);
+        result_rs1 = rs1; 
+        if(!((result_rd == 0x98) && (result_rs1 == 0x10009000))){
             errs = errs + 1;
     }
 

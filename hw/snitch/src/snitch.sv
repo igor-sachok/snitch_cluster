@@ -121,6 +121,7 @@ module snitch import snitch_pkg::*; import riscv_instr::*; #(
   // Debug module's base address
   localparam logic [31:0] DmBaseAddress = 0;
   localparam int RegWidth = RVE ? 4 : 5;
+  localparam int RegNrReadPorts = (XPULPPOSTMOD) ? 3 : 2;
   /// Total physical address portion.
   localparam int unsigned PPNSize = AddrWidth - PageShift;
   localparam bit NSX = XF16 | XF16ALT | XF8 | XFVEC;
@@ -157,8 +158,8 @@ module snitch import snitch_pkg::*; import riscv_instr::*; #(
   logic [RegWidth-1:0] rd, rs1, rs2;
   logic stall, lsu_stall, acc_stall, nonacc_stall, fence_stall;
   // Register connections
-  logic [1:0][RegWidth-1:0] gpr_raddr;
-  logic [1:0][31:0]         gpr_rdata;
+  logic [RegNrReadPorts-1:0][RegWidth-1:0] gpr_raddr;
+  logic [RegNrReadPorts-1:0][31:0]         gpr_rdata;
   logic [0:0][RegWidth-1:0] gpr_waddr;
   logic [0:0][31:0]         gpr_wdata;
   logic [0:0]               gpr_we;
@@ -452,8 +453,10 @@ module snitch import snitch_pkg::*; import riscv_instr::*; #(
   end
   // TODO(zarubaf): This can probably be described a bit more efficient
   assign opa_ready = (opa_select != Reg) | ~sb_q[rs1];
-  assign opb_ready = (opb_select != Reg & opb_select != SImmediate) | ~sb_q[rs2];
-  assign operands_ready = opa_ready & opb_ready;
+  assign opb_ready = ((opb_select != Reg & opb_select != SImmediate) | ~sb_q[rs2]) & ((opb_select != RegRd) | ~sb_q[rd]);
+  assign opc_ready = ((opc_select != Reg) | ~sb_q[rd]) & ((opc_select != RegRs2) | ~sb_q[rs2]);
+  assign operands_ready = opa_ready & opb_ready & opc_ready;
+
   // either we are not using the destination register or we need to make
   // sure that its destination operand is not marked busy in the scoreboard.
   assign dst_ready = ~uses_rd | (uses_rd & ~sb_q[rd]);
@@ -523,6 +526,7 @@ module snitch import snitch_pkg::*; import riscv_instr::*; #(
     alu_op = Add;
     opa_select = None;
     opb_select = None;
+    opc_select = None;
 
     flush_i_valid_o = 1'b0;
     tlb_flush = 1'b0;
@@ -2219,7 +2223,7 @@ module snitch import snitch_pkg::*; import riscv_instr::*; #(
           illegal_inst = 1'b1;
         end
       end
-/*      // opb is usually assigned with the content of rs2; in stores with reg-reg
+      // opb is usually assigned with the content of rs2; in stores with reg-reg
       // addressing mode, however, the offset is stored in rd, so rd content is
       // instead assigned to opb: if we cross such signals now (rd -> opb,
       // rs2 -> opc) we don't have to do that in the ALU, with bigger muxes
@@ -2304,7 +2308,7 @@ module snitch import snitch_pkg::*; import riscv_instr::*; #(
         end else begin
           illegal_inst = 1'b1;
         end
-      end */
+      end 
       // Floating-Point Load/Store
       // Single Precision Floating-Point
       FLW: begin
@@ -3038,7 +3042,7 @@ module snitch import snitch_pkg::*; import riscv_instr::*; #(
 
   snitch_regfile #(
     .DataWidth    ( 32       ),
-    .NrReadPorts  ( 2        ),
+    .NrReadPorts  ( RegNrReadPorts ),
     .NrWritePorts ( 1        ),
     .ZeroRegZero  ( 1        ),
     .AddrWidth    ( RegWidth )
@@ -3074,13 +3078,16 @@ module snitch import snitch_pkg::*; import riscv_instr::*; #(
       SFImmediate, SImmediate: opb = simm;
       PC: opb = pc_q;
       CSR: opb = csr_rvalue;
+      RegRd: opb = gpr_rdata[2];
       default: opb = '0;
     endcase
   end
 
   assign gpr_raddr[0] = rs1;
   assign gpr_raddr[1] = rs2;
-  assign gpr_raddr[2] = rd;
+  if (RegNrReadPorts >= 3) begin
+    assign gpr_raddr[2] = rd;
+  end
 
   // --------------------
   // ALU
