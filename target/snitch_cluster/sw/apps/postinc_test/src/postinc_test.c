@@ -12,18 +12,13 @@ int main() {
 	int8_t *mem8 = (int8_t *)0x10000000;
 	mem8[0] = 0x21;
 	 register int32_t rd asm("a3") = 1;   
-         register int32_t rs1 asm("a4") = 0x10000000; // rs1, data source
-        // P_LB_IRPOST
-        asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b000 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
-             : "+r"(rs1), "=r"(rd)
-             : 
-             : "a3", "a4"
-             );			
+         register int32_t rs1 asm("a4") = 0x10000000; // rs1, data source	
+	asm volatile(
+    	  "p.lb a3, 4(a4!)\n"
+   	  : "+r"(rs1), "=r"(rd)
+  	  :
+  	  : "a3", "a4"
+	);			
         result_rd = rd;
         result_rs1 = rs1;
         if(!((result_rd == 0x21 ) && (result_rs1 == 0x10000004))) {
@@ -33,16 +28,12 @@ int main() {
      // P_LBU_IRPOST
     *(uint8_t*)(0x10002000) = 0x78;
         rs1 = 0x10002000; 
-       asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b100 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
-             : "+r"(rs1), "=r"(rd)
-             : 
-             : "a3", "a4"
-             ); 
+       asm volatile(
+   	 "p.lbu a3, 4(a4!)\n"
+   	 : "+r"(rs1), "=r"(rd)
+   	 :
+   	 : "a3", "a4"
+	);
          result_rd = rd;
         result_rs1 = rs1;                       
         if(!((result_rd == 0x78) && (result_rs1 == 0x10002004))){
@@ -53,11 +44,7 @@ int main() {
     *(int16_t*)(0x10000000) = 0x231;
         rs1 = 0x10000000; 
     asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b001 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
+            "p.lh a3, 4(a4!)\n"
              : "+r"(rs1), "=r"(rd)
              : 
              : "a3", "a4"
@@ -72,11 +59,7 @@ int main() {
     *(uint16_t*)(0x10001000) = 0x34;
         rs1 = 0x10001000; 
     asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b101 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
+            "p.lhu a3, 4(a4!)\n" 
              : "+r"(rs1), "=r"(rd)
              : 
              : "a3", "a4"
@@ -91,11 +74,7 @@ int main() {
     *(int32_t*)(0x10000000) = 0x23;
         rs1 = 0x10000000; 
     asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b010 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
+            "p.lw   a3, 4(a4!)\n" 
              : "+r"(rs1), "=r"(rd)
              : 
              : "a3", "a4"
@@ -112,12 +91,7 @@ int main() {
     register int32_t rs2 asm("a5") = 8; 
     rs1 = 0x10001000; 
     asm volatile(                         //incr +rs2 to rs1
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b111 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
+            "p.lb   a3, a5(a4!)\n" 
              : "+r"(rs1), "=r"(rd)
              : "r"(rs2)
              : "a3", "a4", "a5"
@@ -133,12 +107,7 @@ int main() {
     rs2 = 4; 
     rs1 = 0x10001800; 
     asm volatile(                         //incr +rs2 to rs1
-            ".word (0b0100000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b111 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
+            "p.lbu  a3, a5(a4!)\n" 
              : "+r"(rs1), "=r"(rd)
              : "r"(rs2)
              : "a3", "a4", "a5"
@@ -154,12 +123,7 @@ int main() {
     rs2 = 8; 
     rs1 = 0x10001400; 
      asm volatile(                         //incr +rs2 to rs1
-            ".word (0b0001000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b111 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
+            "p.lh   a3, a5(a4!)\n" 
              : "+r"(rs1), "=r"(rd)
              : "r"(rs2)
              : "a3", "a4", "a5"
@@ -175,12 +139,7 @@ int main() {
     rs2 = 10; 
     rs1 = 0x10002400; 
      asm volatile(                         //incr +rs2 to rs1
-            ".word (0b0101000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b111 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
+            "p.lhu  a3, a5(a4!)\n" 
              : "+r"(rs1), "=r"(rd)
              : "r"(rs2)
              : "a3", "a4", "a5"
@@ -196,12 +155,7 @@ int main() {
     rs2 = 20; 
     rs1 = 0x10002100; 
      asm volatile(                         //incr +rs2 to rs1
-            ".word (0b0010000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b111 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
+            "p.lw   a3, a5(a4!)\n" 
              : "+r"(rs1), "=r"(rd)
              : "r"(rs2)
              : "a3", "a4", "a5"
@@ -217,12 +171,7 @@ int main() {
     rs2 = 10; 
     rs1 = 0x10002000; 
      asm volatile(                         //read from rs1 + rs2
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b111 << 12) | \
-             (    (13) << 7)   | \
-             (0b0000011 <<  0)   \n" 
+            "p.lb   a3, a5(a4)\n" 
              : "=r"(rd)
              : "r"(rs1), "r"(rs2)
              : "a3", "a4", "a5"
@@ -238,12 +187,7 @@ int main() {
     rs2 = 10; 
     rs1 = 0x10003000; 
      asm volatile(                         //read from rs1 + rs2
-            ".word (0b0100000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b111 << 12) | \
-             (    (13) << 7)   | \
-             (0b0000011 <<  0)   \n" 
+            "p.lbu  a3, a5(a4)\n" 
              : "=r"(rd)
              : "r"(rs1), "r"(rs2)
              : "a3", "a4", "a5"
@@ -259,12 +203,7 @@ int main() {
     rs2 = 4; 
     rs1 = 0x10004000; 
      asm volatile(                         //read from rs1 + rs2
-            ".word (0b0001000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b111 << 12) | \
-             (    (13) << 7)   | \
-             (0b0000011 <<  0)   \n" 
+            "p.lh   a3, a5(a4)\n" 
              : "=r"(rd)
              : "r"(rs1), "r"(rs2)
              : "a3", "a4", "a5"
@@ -280,12 +219,7 @@ int main() {
     rs2 = 8; 
     rs1 = 0x10003000; 
      asm volatile(                         //read from rs1 + rs2
-            ".word (0b0001000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b111 << 12) | \
-             (    (13) << 7)   | \
-             (0b0000011 <<  0)   \n" 
+            "p.lhu  a3, a5(a4)\n" 
              : "=r"(rd)
              : "r"(rs1), "r"(rs2)
              : "a3", "a4", "a5"
@@ -301,12 +235,7 @@ int main() {
     rs2 = 4; 
     rs1 = 0x10009000; 
      asm volatile(                         //read from rs1 + rs2
-            ".word (0b0010000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b111 << 12) | \
-             (    (13) << 7)   | \
-             (0b0000011 <<  0)   \n" 
+            "p.lw   a3, a5(a4)\n" 
              : "=r"(rd)
              : "r"(rs1), "r"(rs2)
              : "a3", "a4", "a5"
@@ -321,12 +250,7 @@ int main() {
     rs2 = 0x76;
     rs1 = 0x10000000; 
      asm volatile(                         //write rs2 value to rs1, increment rs1
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b000 << 12) | \
-             (    0b00100 << 7)   | \
-             (0b0101011 <<  0)   \n" 
+            "p.sb   a5, 4(a4!)\n" 
              : "+r"(rs1)
              : "r"(rs2)
              : "a3", "a4"
@@ -341,12 +265,7 @@ int main() {
     rs2 = 0x99;
     rs1 = 0x10001000; 
      asm volatile(                         //write rs2 value to rs1, increment rs1
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b001 << 12) | \
-             (    0b00100 << 7)   | \
-             (0b0101011 <<  0)   \n" 
+            "p.sh   a5, 4(a4!)\n" 
              : "+r"(rs1)
              : "r"(rs2)
              : "a3", "a4"
@@ -361,12 +280,7 @@ int main() {
     rs2 = 0x71;
     rs1 = 0x10001100; 
      asm volatile(                         //write rs2 value to rs1, increment rs1
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b010 << 12) | \
-             (    0b00100 << 7)   | \
-             (0b0101011 <<  0)   \n" 
+            "p.sw   a5, 4(a4!)\n" 
              : "+r"(rs1)
              : "r"(rs2)
              : "a4", "a5"
@@ -382,12 +296,7 @@ int main() {
     rs1 = 0x10001300; 
     rd = 0x4;
      asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b100 << 12) | \
-             (    (13) << 7)   | \
-             (0b0101011 <<  0)   \n" 
+            "p.sb   a5, a3(a4!)\n" 
              : "+r"(rs1)
              : "r"(rs2), "r"(rd)
              : "a3", "a4", "a5"
@@ -403,12 +312,7 @@ int main() {
     rs1 = 0x10002000; 
     rd = 0x8;
      asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b101 << 12) | \
-             (    (13) << 7)   | \
-             (0b0101011 <<  0)   \n" 
+            "p.sh   a5, a3(a4!)\n" 
              : "+r"(rs1)
              : "r"(rs2), "r"(rd)
              : "a3", "a4", "a5"
@@ -424,12 +328,7 @@ int main() {
     rs1 = 0x10002500; 
     rd = 0x100;
      asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b110 << 12) | \
-             (    (13) << 7)   | \
-             (0b0101011 <<  0)   \n" 
+            "p.sw   a5, a3(a4!)\n" 
              : "+r"(rs1)
              : "r"(rs2), "r"(rd)
              : "a3", "a4", "a5"
@@ -445,12 +344,7 @@ int main() {
     rs1 = 0x10002800; 
     rd = 0x100;
      asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b100 << 12) | \
-             (    (13) << 7)   | \
-             (0b0100011 <<  0)   \n" 
+            "p.sb   a5, a3(a4)\n" 
              : 
              : "r"(rs2), "+r"(rs1), "r"(rd) 
              : "a3", "a4", "a5"
@@ -466,12 +360,7 @@ int main() {
     rs1 = 0x10002000; 
     rd = 0x80;
      asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b101 << 12) | \
-             (    (13) << 7)   | \
-             (0b0100011 <<  0)   \n" 
+            "p.sh   a5, a3(a4)\n" 
              : 
              : "r"(rs2), "+r"(rs1), "r"(rd) 
              : "a3", "a4", "a5"
@@ -487,12 +376,7 @@ int main() {
     rs1 = 0x10009000; 
     rd = 0x20;
      asm volatile(                         //write rs2 value to rs1, increment rs1 by rs3
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b110 << 12) | \
-             (    (13) << 7)   | \
-             (0b0100011 <<  0)   \n" 
+            "p.sw   a5, a3(a4)\n" 
              : 
              : "r"(rs2), "+r"(rs1), "r"(rd) 
              : "a3", "a4", "a5"
@@ -503,187 +387,9 @@ int main() {
             errs = errs + 1;
     }
 
-
         return errs;
         } else return 0;
         snrt_cluster_hw_barrier();
     return 0;
 } 
 
-/*int main() {
-uint32_t core_id = snrt_global_core_num();
-   snrt_cluster_hw_barrier();
-   if (core_id == 2) {
-   //	printf("Hello, World!\n");
-        int errs = 0;
-	int32_t result_rd;
-        int32_t result_rs1;
-	int8_t *mem8 = (int8_t *)0x10000000;
-	mem8[0] = 0x21;
-	volatile register int32_t rd asm("a3") = 1;   
-        volatile register int32_t rs1 asm("a4") = 0x10000000; // rs1, data source
-        // P_LB_IRPOST
-       asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b000 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
-             : "+r"(rs1), "=r"(rd)
-             : 
-             : "a3", "a4"
-             );			
-        result_rd = rd;
-        result_rs1 = rs1;
-     //   printf("test %d", result_rd);				 		
-        if(((result_rd == 0x21 ) && (result_rs1 == 0x10000004))){
-       //	printf("test %d", result_rd);
-       	 errs = errs + 1;
-        return errs;
-        }			
-         }
-            return 0;
-}   */
-/*	int8_t *mem9 = (int8_t *)0x100000d4;	//  Strange thing, If the programm reads from this address the result is 0.
-	*(int8_t*)(0x100000d0) = 0x89;		//  Are there some issues with Shifts that I don't know??
-	mem9[0] = 0x55;				// Also return err; doesn't work!
-	volatile int8_t *ptr1 = (int8_t *)0x100000d0;
-	int8_t val1 = *ptr1; 
-        rs1 = 0x100000d0;
-	asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b000 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
-             : "+r"(rs1), "=r"(rd)
-             : 
-             : "a3", "a4"
-             );	
-        result_rd = rd;
-        result_rs1 = rs1;			 		
-        if(!((result_rd == 0x100000d4) && (result_rs1 == 0x89))){
-        errs = errs - 1;
-        }
-        *(int8_t*)(0x10001000) = 0x34;
-        rs1 = 0x10001000;
-        volatile int8_t *ptr2 = (int8_t *)0x10001000;
-	int8_t val2 = *ptr2;  
-            snrt_cluster_hw_barrier();
-       asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b000 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
-             : "+r"(rs1), "=r"(rd)
-             : 
-             : "a3", "a4"
-             );	
-         result_rd = rd;
-        result_rs1 = rs1;				 		
-        if(!((result_rd == 0x10001004) && (result_rs1 == 0x34))){
-        errs = errs - 1;
-	}
-	
-	///////////////////////////
-	 // P_LBU_IRPOST
-	*(uint8_t*)(0x10002000) = 0x78;
-        rs1 = 0x10002000; 
-       asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b100 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
-             : "+r"(rs1), "=r"(rd)
-             : 
-             : "a3", "a4"
-             );	
-         result_rd = rd;
-        result_rs1 = rs1;				 		
-        if(!((result_rd == 0x10002004) && (result_rs1 == 0x78))){
-        errs = errs - 1;
-	}
-	////////////////////
-	//P_LH_IRPOST
-	*(int16_t*)(0x10000000) = 0x231;
-        rs1 = 0x10000000; 
-	asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b001 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
-             : "+r"(rs1), "=r"(rd)
-             : 
-             : "a3", "a4"
-             );	
-         result_rd = rd;
-        result_rs1 = rs1;				 		
-        if(!((result_rd == 0x10000004) && (result_rs1 == 0x231))){
-        errs = errs - 1;
-	}
-	/////////////////
-	//P_LHU_IRPOST
-	*(uint16_t*)(0x10001000) = 0x34;
-        rs1 = 0x10001000; 
-	asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b101 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
-             : "+r"(rs1), "=r"(rd)
-             : 
-             : "a3", "a4"
-             );	
-         result_rd = rd;
-        result_rs1 = rs1;				 		
-        if(!((result_rd == 0x10001004) && (result_rs1 == 0x34))){
-        errs = errs - 1;
-	}
-	/////////////////
-	//P_LW_IRPOST
-	*(int32_t*)(0x100002000) = 0x23;
-        rs1 = 0x10002000; 
-	asm volatile(                         //incr +4 to rs1
-            ".word (0b000000000100 << 20) | \
-             (     (14) << 15) | \
-             (    0b010 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
-             : "+r"(rs1), "=r"(rd)
-             : 
-             : "a3", "a4"
-             );	
-         result_rd = rd;
-        result_rs1 = rs1;				 		
-        if(!((result_rd == 0x10002004) && (result_rs1 == 0x23))){
-        errs = errs - 1;
-	}
-	//////////////////
-	//P_LB_RRPOST
-	*(int8_t*)(0x100000000) = 0x23;
-	volatile register int32_t rs2 asm("a5") = 4; 
-        rs1 = 0x10000000; 
-	asm volatile(                         //incr +4 to rs1
-            ".word (0b0000000 << 25) | \
-             (     (15) << 20) | \
-             (     (14) << 15) | \
-             (    0b010 << 12) | \
-             (    (13) << 7)   | \
-             (0b0001011 <<  0)   \n" 
-             : "+r"(rs1), "=r"(rd)
-             : "r"(rs2)
-             : "a3", "a4", "a5"
-             );	
-          rs2 = rs2 + 3;
-         result_rd = rd;
-        result_rs1 = rs1;				 		
-        if(!((result_rd == 0x10000004) && (result_rs1 == 0x23))){
-        errs = errs - 1;
-	}
-		*/
-       
-    

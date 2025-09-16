@@ -26,7 +26,8 @@ RISCV_OBJCOPY   ?= $(LLVM_BINROOT)/llvm-objcopy
 RISCV_OBJDUMP   ?= $(LLVM_BINROOT)/llvm-objdump
 
 # Compiler flags
-RISCV_CFLAGS := -mcpu=snitch
+#RISCV_CFLAGS := -mcpu=snitch
+RISCV_CFLAGS := -march=rv32imafd_zfh_xfrep_xssr_xdma_xcopift_xfalthalf_xfquarter_xfaltquarter_xfvecsingle_xfvechalf_xfvecalthalf_xfvecquarter_xfvecaltquarter_xfauxhalf_xfauxalthalf_xfauxquarter_xfauxaltquarter_xfauxvecsingle_xfauxvechalf_xfauxvecalthalf_xfauxvecquarter_xfauxvecaltquarter_xfexpauxvechalf_xfexpauxvecalthalf_xfexpauxvecquarter_xfexpauxvecaltquarter_xpulppostmod
 RISCV_CFLAGS += -menable-experimental-extensions
 RISCV_CFLAGS += -mabi=ilp32d
 RISCV_CFLAGS += -mcmodel=medany
